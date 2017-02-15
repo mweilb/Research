@@ -5,5 +5,14 @@
     <Parameter Name="ActorServicesActorService_PartitionCount" Value="1" />
     <Parameter Name="ActorServicesActorService_TargetReplicaSetSize" Value="1" />
     <Parameter Name="ActorServicesActorService_MinReplicaSetSize" Value="1" />
+    <Parameter Name="ChunkActorService_PartitionCount" Value="1" />
+    <Parameter Name="ChunkActorService_TargetReplicaSetSize" Value="1" />
+    <Parameter Name="ChunkActorService_MinReplicaSetSize" Value="1" />
+    <Parameter Name="PlayerAgentActorService_PartitionCount" Value="1" />
+    <Parameter Name="PlayerAgentActorService_TargetReplicaSetSize" Value="1" />
+    <Parameter Name="PlayerAgentActorService_MinReplicaSetSize" Value="1" />
+    <Parameter Name="WorldActorService_PartitionCount" Value="1" />
+    <Parameter Name="WorldActorService_TargetReplicaSetSize" Value="1" />
+    <Parameter Name="WorldActorService_MinReplicaSetSize" Value="1" />
   </Parameters>
 </Application>

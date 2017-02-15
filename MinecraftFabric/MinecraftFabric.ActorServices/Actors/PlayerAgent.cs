@@ -32,16 +32,18 @@ namespace MinecraftFabric.ActorServices.Actors
         }
 
 
-        public void Init(BlockMetaData[] blocks, PlayerMetaData[] players)
+        public Task Init(BlockMetaData[] blocks, PlayerMetaData[] players)
         {
             var ev = GetEvent<IChunkUpdateEvent>();
             ev.Init(blocks,players);
+            return Task.FromResult(0);
         }
 
-        public void Update(BlockMetaData[] blocks, PlayerMetaData[] players)
+        public Task Update(BlockMetaData[] blocks, PlayerMetaData[] players)
         {
             var ev = GetEvent<IChunkUpdateEvent>();
             ev.Update(blocks, players);
+            return Task.FromResult(0);
         }
 
     }

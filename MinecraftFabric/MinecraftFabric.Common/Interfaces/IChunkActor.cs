@@ -9,7 +9,7 @@ namespace MinecraftFabric.ActorServices.Interfaces
 {
     public interface IChunkActor : IActor
     {
-        Task<GenericResponse> Initialize(ActorId sessionID, Position minLocation, Position maxLocation);
+        Task<GenericResponse> Initialize(ActorId sessionID, Position minLocation, int chunkStride);
         Task<GenericResponse> Associate(ActorId sessionID, ActorId chunkID, int fidelity, Position position, int blockStride);
         Task<GenericResponse> SetResponseTime(int millisecond);
 

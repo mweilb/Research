@@ -7,5 +7,26 @@
   <Section Name="ActorServicesActorServiceReplicatorSecurityConfig">
     <Parameter Name="CredentialType" Value="None" />
   </Section>
+  <Section Name="ChunkActorServiceReplicatorConfig">
+    <Parameter Name="ReplicatorEndpoint" Value="ChunkActorServiceReplicatorEndpoint" />
+    <Parameter Name="BatchAcknowledgementInterval" Value="0.005" />
+  </Section>
+  <Section Name="ChunkActorServiceReplicatorSecurityConfig">
+    <Parameter Name="CredentialType" Value="None" />
+  </Section>
+  <Section Name="PlayerAgentActorServiceReplicatorConfig">
+    <Parameter Name="ReplicatorEndpoint" Value="PlayerAgentActorServiceReplicatorEndpoint" />
+    <Parameter Name="BatchAcknowledgementInterval" Value="0.005" />
+  </Section>
+  <Section Name="PlayerAgentActorServiceReplicatorSecurityConfig">
+    <Parameter Name="CredentialType" Value="None" />
+  </Section>
+  <Section Name="WorldActorServiceReplicatorConfig">
+    <Parameter Name="ReplicatorEndpoint" Value="WorldActorServiceReplicatorEndpoint" />
+    <Parameter Name="BatchAcknowledgementInterval" Value="0.005" />
+  </Section>
+  <Section Name="WorldActorServiceReplicatorSecurityConfig">
+    <Parameter Name="CredentialType" Value="None" />
+  </Section>
   <!-- The content will be generated during build -->
 </Settings>

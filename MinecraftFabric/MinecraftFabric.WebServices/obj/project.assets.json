@@ -7461,10 +7461,10 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Research\\MinecraftFabric\\MinecraftFabric.WebServices\\MinecraftFabric.WebServices.csproj",
+      "projectUniqueName": "C:\\Users\\mweilb\\Documents\\GitHub\\Research\\MinecraftFabric\\MinecraftFabric.WebServices\\MinecraftFabric.WebServices.csproj",
       "projectName": "MinecraftFabric.WebServices",
-      "projectPath": "C:\\Research\\MinecraftFabric\\MinecraftFabric.WebServices\\MinecraftFabric.WebServices.csproj",
-      "outputPath": "C:\\Research\\MinecraftFabric\\MinecraftFabric.WebServices\\obj\\",
+      "projectPath": "C:\\Users\\mweilb\\Documents\\GitHub\\Research\\MinecraftFabric\\MinecraftFabric.WebServices\\MinecraftFabric.WebServices.csproj",
+      "outputPath": "C:\\Users\\mweilb\\Documents\\GitHub\\Research\\MinecraftFabric\\MinecraftFabric.WebServices\\obj\\",
       "projectStyle": "PackageReference",
       "originalTargetFrameworks": [
         "net452"

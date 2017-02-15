@@ -1,1 +1,2 @@
 C:\Research\MinecraftFabric\MinecraftFabric\obj\x64\Debug\MinecraftFabric.sfprojResolveAssemblyReference.cache
+C:\Users\mweilb\Documents\GitHub\Research\MinecraftFabric\MinecraftFabric\obj\x64\Debug\MinecraftFabric.sfprojResolveAssemblyReference.cache

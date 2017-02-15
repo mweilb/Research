@@ -5,6 +5,15 @@
     <Parameter Name="ActorServicesActorService_PartitionCount" DefaultValue="10" />
     <Parameter Name="ActorServicesActorService_MinReplicaSetSize" DefaultValue="3" />
     <Parameter Name="ActorServicesActorService_TargetReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="ChunkActorService_PartitionCount" DefaultValue="10" />
+    <Parameter Name="ChunkActorService_MinReplicaSetSize" DefaultValue="1" />
+    <Parameter Name="ChunkActorService_TargetReplicaSetSize" DefaultValue="1" />
+    <Parameter Name="PlayerAgentActorService_PartitionCount" DefaultValue="10" />
+    <Parameter Name="PlayerAgentActorService_MinReplicaSetSize" DefaultValue="1" />
+    <Parameter Name="PlayerAgentActorService_TargetReplicaSetSize" DefaultValue="1" />
+    <Parameter Name="WorldActorService_PartitionCount" DefaultValue="10" />
+    <Parameter Name="WorldActorService_MinReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="WorldActorService_TargetReplicaSetSize" DefaultValue="3" />
   </Parameters>
   <!-- Import the ServiceManifest from the ServicePackage. The ServiceManifestName and ServiceManifestVersion 
        should match the Name and Version attributes of the ServiceManifest element defined in the 
@@ -30,6 +39,21 @@
     <Service Name="ActorServicesActorService" GeneratedIdRef="6b256c53-1c65-410d-9409-b55de6269862|Persisted">
       <StatefulService ServiceTypeName="ActorServicesActorServiceType" TargetReplicaSetSize="[ActorServicesActorService_TargetReplicaSetSize]" MinReplicaSetSize="[ActorServicesActorService_MinReplicaSetSize]">
         <UniformInt64Partition PartitionCount="[ActorServicesActorService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+      </StatefulService>
+    </Service>
+    <Service Name="ChunkActorService" GeneratedIdRef="5d02f4b6-c9dc-4871-a3ba-af29de4cca93|None">
+      <StatefulService ServiceTypeName="ChunkActorServiceType" TargetReplicaSetSize="[ChunkActorService_TargetReplicaSetSize]" MinReplicaSetSize="[ChunkActorService_MinReplicaSetSize]">
+        <UniformInt64Partition PartitionCount="[ChunkActorService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+      </StatefulService>
+    </Service>
+    <Service Name="PlayerAgentActorService" GeneratedIdRef="e2e4b9f6-af53-479c-af1c-2fc81535dc9f|None">
+      <StatefulService ServiceTypeName="PlayerAgentActorServiceType" TargetReplicaSetSize="[PlayerAgentActorService_TargetReplicaSetSize]" MinReplicaSetSize="[PlayerAgentActorService_MinReplicaSetSize]">
+        <UniformInt64Partition PartitionCount="[PlayerAgentActorService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+      </StatefulService>
+    </Service>
+    <Service Name="WorldActorService" GeneratedIdRef="53e92b67-a0f6-47c4-8957-fa947e73d25f|Persisted">
+      <StatefulService ServiceTypeName="WorldActorServiceType" TargetReplicaSetSize="[WorldActorService_TargetReplicaSetSize]" MinReplicaSetSize="[WorldActorService_MinReplicaSetSize]">
+        <UniformInt64Partition PartitionCount="[WorldActorService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
       </StatefulService>
     </Service>
   </DefaultServices>
