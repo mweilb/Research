@@ -7456,15 +7456,15 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\mweilb\\.nuget\\packages\\": {}
+    "C:\\Users\\mweilb.REDMOND\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Research\\MinecraftFabric\\MinecraftFabric.WebServices\\MinecraftFabric.WebServices.csproj",
+      "projectUniqueName": "C:\\Projects\\Research\\MinecraftFabric\\MinecraftFabric.WebServices\\MinecraftFabric.WebServices.csproj",
       "projectName": "MinecraftFabric.WebServices",
-      "projectPath": "C:\\Research\\MinecraftFabric\\MinecraftFabric.WebServices\\MinecraftFabric.WebServices.csproj",
-      "outputPath": "C:\\Research\\MinecraftFabric\\MinecraftFabric.WebServices\\obj\\",
+      "projectPath": "C:\\Projects\\Research\\MinecraftFabric\\MinecraftFabric.WebServices\\MinecraftFabric.WebServices.csproj",
+      "outputPath": "C:\\Projects\\Research\\MinecraftFabric\\MinecraftFabric.WebServices\\obj\\",
       "projectStyle": "PackageReference",
       "originalTargetFrameworks": [
         "net452"

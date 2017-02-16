@@ -1,4 +1,5 @@
-﻿using MinecraftFabric.ActorServices.DataContracts;
+﻿using Microsoft.ServiceFabric.Actors;
+using MinecraftFabric.ActorServices.DataContracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,15 +16,10 @@ namespace MinecraftFabric.ActorServices.DataContracts
         public Vector location { get; set; }
 
         [DataMember]
-        public string id { get; set; }
+        public ActorId id { get; set; }
 
         [DataMember]
         public MinecraftVersion version { get; set; }
 
-        [DataMember]
-        public string creator { get; set; }
-
-        [DataMember]
-        public string lastTouched { get; set; }
     }
 }
