@@ -6,6 +6,7 @@ using MinecraftFabric.ActorServices.DataContracts;
 using MinecraftFabric.ActorServices.Interfaces;
 using MinecraftFabric.ActorServices.TaskResponses;
 using System.Collections.Generic;
+using Microsoft.ServiceFabric.Actors.Client;
 
 namespace MinecraftFabric.ActorServices.Actors
 {
@@ -182,14 +183,16 @@ namespace MinecraftFabric.ActorServices.Actors
                 if ((tracking.needInitObservers.Count > 0) || (observers.Count > 0))
                 {
                     var actorID = tracking.actorID;
+                    var chunkActor = ActorProxy.Create<ChunkActor>(actorID, this.ServiceUri);
 
-                    tracking.updateTask = grain.InformOfChange(tracking.mNeedInitObservers, mObservers, tracking.mPlayerVersion, tracking.mMaxPlayers, tracking.mBlockVersion, tracking.mMaxBlocks);
+                    tracking.updateTask = chunkActor.InformOfChange(tracking.needInitObservers, observers, tracking.playerVersion, tracking.maxPlayers, tracking.blockVersion, tracking.maxBlocks);
                 }
 
-                tracking.mNeedInitObservers.Clear();
-
+                tracking.needInitObservers.Clear();
+                //need to save
             }
 
+            //covert over...
             mObservers.AddRange(mNeedsInitObservers);
             mNeedsInitObservers.Clear();
 
