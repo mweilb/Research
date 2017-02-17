@@ -20,6 +20,3 @@ C:\Research\MinecraftFabric\MinecraftFabric.ActorServices\obj\x64\Debug\Minecraf
 C:\Research\MinecraftFabric\MinecraftFabric.ActorServices\obj\x64\Debug\MinecraftFabric.ActorServices.pdb
 C:\Research\MinecraftFabric\MinecraftFabric.ActorServices\bin\x64\Debug\MinecraftFabrics.ActorServices.Interfaces.dll
 C:\Research\MinecraftFabric\MinecraftFabric.ActorServices\bin\x64\Debug\MinecraftFabrics.ActorServices.Interfaces.pdb
-C:\Projects\Research\MinecraftFabric\MinecraftFabric.ActorServices\obj\x64\Debug\MinecraftFabric.ActorServices.csprojResolveAssemblyReference.cache
-C:\Projects\Research\MinecraftFabric\MinecraftFabric.ActorServices\obj\x64\Debug\MinecraftFabric.ActorServices.exe
-C:\Projects\Research\MinecraftFabric\MinecraftFabric.ActorServices\obj\x64\Debug\MinecraftFabric.ActorServices.pdb

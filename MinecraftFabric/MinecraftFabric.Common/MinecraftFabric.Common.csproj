@@ -70,15 +70,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataContracts\BlockMetaData.cs" />
+    <Compile Include="DataContracts\AssociateChunkMetaData.cs" />
     <Compile Include="DataContracts\MinecraftVersion.cs" />
     <Compile Include="DataContracts\PlayerMetaData.cs" />
     <Compile Include="DataContracts\Position.cs" />
+    <Compile Include="DataContracts\TrackingChunkMetaData.cs" />
     <Compile Include="DataContracts\Vector.cs" />
     <Compile Include="DataContracts\WorldInfoMetaData.cs" />
     <Compile Include="Events\IChunkUpdateEvent.cs" />
     <Compile Include="Interfaces\IBlocksPerChunkActor.cs" />
     <Compile Include="Interfaces\IActorServices.cs" />
     <Compile Include="Interfaces\IChunkActor.cs" />
+    <Compile Include="Interfaces\IInformActor.cs" />
     <Compile Include="Interfaces\IPlayerAgent.cs" />
     <Compile Include="Interfaces\IWorldActor.cs" />
     <Compile Include="Interfaces\IPlayersPerChunkActor.cs" />

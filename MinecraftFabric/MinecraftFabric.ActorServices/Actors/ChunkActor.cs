@@ -13,6 +13,7 @@ namespace MinecraftFabric.ActorServices.Actors
     class ChunkActor : Actor, IChunkActor
     {
         private IActorTimer _updateTimer;
+        private Dictionary<ActorId, TrackingChunkMetaData> _tracking;
 
         public ChunkActor(ActorService actorService, ActorId actorId) : base(actorService, actorId)
         {
@@ -32,6 +33,9 @@ namespace MinecraftFabric.ActorServices.Actors
             this.StateManager.TryAddStateAsync("worldActorID", new ActorId(""));
             this.StateManager.TryAddStateAsync("minLocation", new Position(0,0,0));
             this.StateManager.TryAddStateAsync("chunkStride", 0);
+
+            _tracking = new Dictionary<ActorId, TrackingChunkMetaData>();
+
             return Task.FromResult(0);
         }
  
@@ -43,14 +47,13 @@ namespace MinecraftFabric.ActorServices.Actors
             return new GenericResponse();
         }
 
-        public async Task<GenericResponse> Associate(ActorId sessionID, ActorId actorID, int fidelity, Position position, int blockStride)
+        public async Task<GenericResponse> Associate(ActorId informChunkActorId, ActorId blockPerChunkActorId, ActorId playersPerChunkActorId, int fidelity, Position position, int blockStride)
         {
             var associations = await this.StateManager.GetStateAsync<Dictionary<ActorId, AssociateChunkMetaData>>("associations");
 
-            var metaData = new AssociateChunkMetaData(actorID,fidelity,position,blockStride);
-            associations.Add(actorID, metaData);
+            var metaData = new AssociateChunkMetaData(informChunkActorId, blockPerChunkActorId, playersPerChunkActorId, fidelity,position,blockStride);
+            associations.Add(informChunkActorId, metaData);
             await this.StateManager.SetStateAsync<Dictionary<ActorId, AssociateChunkMetaData>>("associations", associations);
-
             return new GenericResponse();
         }
 
@@ -89,9 +92,6 @@ namespace MinecraftFabric.ActorServices.Actors
             initPlayers.Add(playerAgentID, version);
             await this.StateManager.SetStateAsync("initializeObservers", initPlayers);
 
-
-            var associations = await this.StateManager.GetStateAsync<Dictionary<ActorId, AssociateChunkMetaData>>("associations");
-
             //map to hash for faster lookup
             var map = new HashSet<ActorId>();
             foreach (var actor in fromActors)
@@ -99,22 +99,24 @@ namespace MinecraftFabric.ActorServices.Actors
                 map.Add(actor);
             }
 
+            var associations = await this.StateManager.GetStateAsync<Dictionary<ActorId, AssociateChunkMetaData>>("associations");
             //each associated grain needs to update this one
             foreach (var pair in associations)
             {
                 var actorID = pair.Key;
                 if (map.Contains(actorID) == false)
                 {
-                    var assoicationMetaData = pair.Value;
-                    assoicationMetaData.needInitObservers.Add(actorID);
+                    var assocations = pair.Value;
+                    assocations.needInitObservers.Add(actorID);
                 }
             }
 
+            await this.StateManager.SetStateAsync("associations", associations);
 
             //if no updates are occuring, now we have a player to update
             if (_updateTimer == null)
             {
-                int updateRate = await this.StateManager.GetStateAsync<int>("initializeObservers");
+                int updateRate = await this.StateManager.GetStateAsync<int>("updateRateMS");
                 _updateTimer = RegisterTimer((_) => Fetch(), null, TimeSpan.FromMilliseconds(0), TimeSpan.FromMilliseconds(updateRate));
             }
 
@@ -151,26 +153,49 @@ namespace MinecraftFabric.ActorServices.Actors
             return new GenericResponse(false, "Observer not found");
         }
 
- 
-        public Task<InformOfChunkChangeResponse> InformOfChange(IChunkActor actor, MinecraftVersion lastPlayerVersion, int suggestedMaxPlayerRequests, MinecraftVersion lastBlockVersion, int suggestedMaxBlockRequests)
-        {
-            throw new NotImplementedException();
-        }
 
         private async Task Fetch()
         {
-            var associations = await this.StateManager.GetStateAsync<Dictionary<ActorId, AssociateChunkMetaData>>("associations");
-
-            if (HasLastFetchFinished(associations) == false)
+ 
+            if (HasLastFetchFinished() == false)
             {
                 return;
             }
 
-            CalculateDistribution(associations,1000,4096);
+
+            var associationsTask =  this.StateManager.GetStateAsync<Dictionary<ActorId, AssociateChunkMetaData>>("associations");
+            var playersTask = this.StateManager.GetStateAsync<Dictionary<ActorId, MinecraftVersion>>("observers");
+            var initPlayersTask = this.StateManager.GetStateAsync<Dictionary<ActorId, MinecraftVersion>>("initializeObservers");
+            await Task.WhenAll(associationsTask, playersTask, initPlayersTask);
+
+            var associations = associationsTask.Result;
+            var players = playersTask.Result;
+            var initPlayers = initPlayersTask.Result;
+            
+            CalculateDistribution(1000,4096);
+
+            ActorId[] actorIds = null;
+
+  
+            if (players.Count != 0)
+            {
+                actorIds = new ActorId[players.Count];
+                players.Keys.CopyTo(actorIds, 0);
+            }
 
             foreach (var pair in associations)
             {
-                var tracking = pair.Value;
+                var association = pair.Value;
+
+                //if no tracking pieces, then recreate... this handle the re-hydrate of the actor
+                if (_tracking.ContainsKey(pair.Key) == false)
+                {
+                    var trackingData = new TrackingChunkMetaData();
+                    trackingData.fidelity = association.fidelity;
+                    _tracking.Add(pair.Key, trackingData);
+                }
+
+                var tracking = _tracking[pair.Key];
  
                 var task = tracking.updateTask;
                 if (task != null)
@@ -180,31 +205,40 @@ namespace MinecraftFabric.ActorServices.Actors
                     tracking.blockVersion = response.lastBlockVersion;
                 }
 
-                if ((tracking.needInitObservers.Count > 0) || (observers.Count > 0))
+                if ((association.needInitObservers.Count > 0) || (actorIds.Length > 0))
                 {
-                    var actorID = tracking.actorID;
-                    var chunkActor = ActorProxy.Create<ChunkActor>(actorID, this.ServiceUri);
-
-                    tracking.updateTask = chunkActor.InformOfChange(tracking.needInitObservers, observers, tracking.playerVersion, tracking.maxPlayers, tracking.blockVersion, tracking.maxBlocks);
+                    var informActor = ActorProxy.Create<InformActor>(pair.Value.informActorId, this.ServiceUri);
+                    tracking.updateTask = informActor.InformOfChange(actorIds, association, tracking);
                 }
 
-                tracking.needInitObservers.Clear();
+                association.needInitObservers.Clear();
                 //need to save
             }
 
-            //covert over...
-            mObservers.AddRange(mNeedsInitObservers);
-            mNeedsInitObservers.Clear();
+            //convert over...
+
+            foreach(var pair in initPlayers)
+            {
+                players.Add(pair.Key, pair.Value);
+            }
+
+            initPlayers.Clear();
+
+            //now save everyting
+            var taskSetInit = this.StateManager.SetStateAsync("initializeObservers", initPlayers);
+            var taskSetObserver =  this.StateManager.SetStateAsync("observers", players);
+            var taskSetAssociation = this.StateManager.SetStateAsync("associations", associations);
+            await Task.WhenAll(taskSetInit, taskSetObserver, taskSetAssociation);
 
             return;
 
         }
 
-        private bool HasLastFetchFinished(Dictionary<ActorId, AssociateChunkMetaData> associations)
+        private bool HasLastFetchFinished()
         {
             bool ready = true;
             //know how many you want to update...
-            foreach (var pair in associations)
+            foreach (var pair in _tracking)
             {
                 var tracking = pair.Value;
 
@@ -222,7 +256,7 @@ namespace MinecraftFabric.ActorServices.Actors
             return ready;
         }
 
-        private void CalculateDistribution(Dictionary<ActorId, AssociateChunkMetaData> associations, int playerBandwidthCap, int blockBandwithCap)
+        private void CalculateDistribution(int playerBandwidthCap, int blockBandwithCap)
         {
             //need to this chunk first as it is closet to player
             //need to recalculate what we expect out of each chunk
@@ -234,7 +268,7 @@ namespace MinecraftFabric.ActorServices.Actors
             float[] playersPercents = { 1.0f, 1.0f, 1.0f, 1.0f };
 
             const int MaxFidelity = 3;
-            foreach (var pair in associations)
+            foreach (var pair in _tracking)
             {
                 var tracking = pair.Value;
                 //see if the last run is done for this request, and update 
@@ -267,7 +301,7 @@ namespace MinecraftFabric.ActorServices.Actors
             playersPercents[0] = 1.0f;
             blocksPercents[0] = 1.0f;
 
-            foreach (var pair in associations)
+            foreach (var pair in _tracking)
             {
                 var tracking = pair.Value;
                 int index = tracking.fidelity;

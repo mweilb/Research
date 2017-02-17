@@ -10,6 +10,6 @@ namespace MinecraftFabric.ActorServices.Interfaces
     {
         Task<GenericResponse> Update(ActorId playerAgentID, PlayerMetaData playerMetaData);
         Task<GenericResponse> Remove(ActorId playerAgentID);
-        Task<PlayerMetaData[]> Get();
+        Task<PlayerMetaData[]> GetAsync();
     }
 }

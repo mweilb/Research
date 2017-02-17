@@ -14,32 +14,26 @@ namespace MinecraftFabric.ActorServices.DataContracts
     [DataContract]
     public sealed class AssociateChunkMetaData
     {
-        public AssociateChunkMetaData(ActorId _actorID, int _fidelity, Position _minLocation, int _blockStride)
+        public AssociateChunkMetaData(ActorId _informActorId, ActorId _blockPerChunkActorId, ActorId _playersPerChunkActorId,  int _fidelity, Position _minLocation, int _blockStride)
         {
-            this.actorID = _actorID;
+            this.informActorId = _informActorId;
             this.fidelity = _fidelity;
-            this.maxBlocks = 0;
-            this.maxPlayers = 0;
+            this.blocksPerChunkActorId = _blockPerChunkActorId;
+            this.playersPerChunkActorId = _playersPerChunkActorId;
             this.minLocation = _minLocation;
             this.maxLocation = new Position(_minLocation.x + _blockStride, _minLocation.y + _blockStride, _minLocation.x + _blockStride);
-            this.updateTask = null;
-            this.playerVersion = MinecraftVersion.GetNext();
             this.stride = _blockStride;
             this.needInitObservers = new List<ActorId>();
         }
 
         [DataMember]
-        public ActorId actorID;
+        public ActorId informActorId;
+        [DataMember]
+        public ActorId blocksPerChunkActorId;
+        [DataMember]
+        public ActorId playersPerChunkActorId;
         [DataMember]
         public int fidelity;
-        [DataMember]
-        public int maxPlayers;
-        [DataMember]
-        public MinecraftVersion playerVersion;
-        [DataMember]
-        public int maxBlocks;
-        [DataMember]
-        public MinecraftVersion blockVersion;
         [DataMember]
         public Position maxLocation;
         [DataMember]
@@ -48,7 +42,7 @@ namespace MinecraftFabric.ActorServices.DataContracts
         public int stride;
         [DataMember]
         public List<ActorId> needInitObservers;
-        [DataMember]
-        public Task<InformOfChunkChangeResponse> updateTask = null;
     }
+
+
 }

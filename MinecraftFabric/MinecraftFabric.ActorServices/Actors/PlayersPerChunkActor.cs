@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace MinecraftFabric.ActorServices.Actors
 {
-    class PlayersPerChunkActor : Actor, IPlayersPerChunkActor
+    public class PlayersPerChunkActor : Actor, IPlayersPerChunkActor
     {
 
         const string _playerTag = "players";

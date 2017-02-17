@@ -1,14 +1,15 @@
 ﻿
+using Microsoft.ServiceFabric.Actors;
 using MinecraftFabric.ActorServices.DataContracts;
 
 namespace MinecraftFabric.ActorServices.TaskResponses
 {
     public class InformOfChunkChangeResponse
     {
-        public string mChunkID;
-        public MinecraftVersion mLastBlockVersion;
-        public int mAvailableBlocks;
-        public MinecraftVersion mLastPlayersVersion;
-        public int mAvailablePlayers;
+        public ActorId actorID;
+        public MinecraftVersion lastBlockVersion;
+        public int availableBlocks;
+        public MinecraftVersion lastPlayersVersion;
+        public int availablePlayers;
     }
 }

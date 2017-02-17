@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace MinecraftFabric.ActorServices.Actors
 {
-    class BlocksPerChunkActor : Actor, IBlocksPerChunkActor
+    public class BlocksPerChunkActor : Actor, IBlocksPerChunkActor
     {
 
         public BlocksPerChunkActor(ActorService actorService, ActorId actorId) : base(actorService, actorId)
@@ -48,7 +48,7 @@ namespace MinecraftFabric.ActorServices.Actors
             }
 
             blocks.Remove(blockData.position);
-            this.StateManager.SetStateAsync("blocks", blocks);
+            await this.StateManager.SetStateAsync("blocks", blocks);
             return new GenericResponse();
         }
 
@@ -66,7 +66,7 @@ namespace MinecraftFabric.ActorServices.Actors
                 blocks.Add(blockData.position, blockData);
             }
 
-            this.StateManager.SetStateAsync("blocks", blocks);
+            await this.StateManager.SetStateAsync("blocks", blocks);
 
             return new GenericResponse();
         }

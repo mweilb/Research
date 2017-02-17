@@ -14,5 +14,14 @@
     <Parameter Name="WorldActorService_PartitionCount" Value="1" />
     <Parameter Name="WorldActorService_TargetReplicaSetSize" Value="1" />
     <Parameter Name="WorldActorService_MinReplicaSetSize" Value="1" />
+    <Parameter Name="BlocksPerChunkActorService_PartitionCount" Value="1" />
+    <Parameter Name="BlocksPerChunkActorService_TargetReplicaSetSize" Value="1" />
+    <Parameter Name="BlocksPerChunkActorService_MinReplicaSetSize" Value="1" />
+    <Parameter Name="InformActorService_PartitionCount" Value="1" />
+    <Parameter Name="InformActorService_TargetReplicaSetSize" Value="1" />
+    <Parameter Name="InformActorService_MinReplicaSetSize" Value="1" />
+    <Parameter Name="PlayersPerChunkActorService_PartitionCount" Value="1" />
+    <Parameter Name="PlayersPerChunkActorService_TargetReplicaSetSize" Value="1" />
+    <Parameter Name="PlayersPerChunkActorService_MinReplicaSetSize" Value="1" />
   </Parameters>
 </Application>

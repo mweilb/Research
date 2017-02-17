@@ -80,6 +80,7 @@
   <ItemGroup>
     <Compile Include="Actors\BlocksPerChunkActor.cs" />
     <Compile Include="Actors\ChunkActor.cs" />
+    <Compile Include="Actors\InformActor.cs" />
     <Compile Include="Actors\PlayerAgent.cs" />
     <Compile Include="Actors\PlayersPerChunkActor.cs" />
     <Compile Include="Actors\WorldActor.cs" />

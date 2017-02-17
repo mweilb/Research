@@ -96,18 +96,25 @@ namespace MinecraftFabric.ActorServices.Actors
                     for (int z = beginPoint.z; z <= endPoint.z; z += chunkStride)
                     {
                         var minPosition = new Position(x, y, z);
-                        ActorId actorID = new ActorId(string.Concat(this.Id, "#", x, "#", y, "#", z));
-           
-                        var chunkActor = ActorProxy.Create<ChunkActor>(actorID, this.ServiceUri);
-                   
+
+                        var chunkID = new ActorId(string.Concat("chunk" + this.Id, "#", x, "#", y, "#", z));
+                        var blockID = new ActorId(string.Concat("block" + this.Id, "#", x, "#", y, "#", z));
+                        var playerID = new ActorId(string.Concat("player" + this.Id, "#", x, "#", y, "#", z));
+                        var informID = new ActorId(string.Concat("player" + this.Id, "#", x, "#", y, "#", z));
+
+                        var chunkActor = ActorProxy.Create<ChunkActor>(chunkID, this.ServiceUri);
+                        var blocksActor = ActorProxy.Create<BlocksPerChunkActor>(blockID, this.ServiceUri);
+                        var playersActor = ActorProxy.Create<BlocksPerChunkActor>(playerID, this.ServiceUri);
+                        var informActor = ActorProxy.Create<BlocksPerChunkActor>(informID, this.ServiceUri);
+
                         var maxPosition = new Position(minPosition);
                         maxPosition.x += chunkStride;
                         maxPosition.y += chunkStride;
                         maxPosition.z += chunkStride;
 
-                        if (chunkDictionary.ContainsKey(actorID) == false)
+                        if (chunkDictionary.ContainsKey(chunkID) == false)
                         {
-                            chunkDictionary.Add(actorID, new Tracking(chunkActor, minPosition, maxPosition));
+                            chunkDictionary.Add(chunkID, new Tracking(chunkActor, minPosition, maxPosition));
                             chunkActor.Initialize(this.Id, minPosition, chunkStride);
                         }   
                     }
@@ -130,13 +137,16 @@ namespace MinecraftFabric.ActorServices.Actors
                         {
                             int fidelity = 0;
                             var newPos = new Position((x * chunkSize) + pos.x, (y * chunkSize) + pos.y, (z * chunkSize) + pos.z);
-                            var actorID = new ActorId(string.Concat(this.Id, "#", newPos.x, "#", newPos.y, "#", newPos.z));
-                          
-                            if (chunkDictionary.ContainsKey(actorID) == true)
-                            {
-                                var tracking = chunkDictionary[actorID];
-                                actor.Associate(this.Id, actorID, fidelity, tracking.mMinPosition, chunkSize);
 
+                            var chunkID = new ActorId(string.Concat("chunk" + this.Id, "#", newPos.x, "#", newPos.y, "#", newPos.z));
+                            var blockID = new ActorId(string.Concat("block" + this.Id, "#", newPos.x, "#", newPos.y, "#", newPos.z));
+                            var playerID = new ActorId(string.Concat("player" + this.Id, "#", newPos.x, "#", newPos.y, "#", newPos.z));
+                            var informID = new ActorId(string.Concat("player" + this.Id, "#", newPos.x, "#", newPos.y, "#", newPos.z));
+
+                            if (chunkDictionary.ContainsKey(chunkID) == true)
+                            {
+                                var tracking = chunkDictionary[chunkID];
+                                actor.Associate(informID,blockID,playerID, fidelity, tracking.mMinPosition, chunkSize);
                             }
 
                         }

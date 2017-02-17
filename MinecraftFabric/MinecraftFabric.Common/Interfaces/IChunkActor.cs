@@ -9,15 +9,16 @@ namespace MinecraftFabric.ActorServices.Interfaces
 {
     public interface IChunkActor : IActor
     {
-        Task<GenericResponse> Initialize(ActorId sessionID, Position minLocation, int chunkStride);
-        Task<GenericResponse> Associate(ActorId sessionID, ActorId chunkID, int fidelity, Position position, int blockStride);
+        Task<GenericResponse> Initialize(ActorId worldActorId, Position minLocation, int chunkStride);
+
+        Task<GenericResponse> Associate(ActorId informActorId, ActorId blockPerChunkActorId, ActorId playersPerChunkActorId, int fidelity, Position position, int blockStride);
+        Task<ActorId[]> GetAssociations();
+
         Task<GenericResponse> SetResponseTime(int millisecond);
 
-        Task<GenericResponse> RegisterObserver(ActorId playerAgentID, string[] fromActors);
+        Task<GenericResponse> RegisterObserver(ActorId playerAgentID, ActorId[] fromActors);
         
         Task<GenericResponse> UnRegisterObserver(ActorId playerAgentID);
-
-        Task<InformOfChunkChangeResponse> InformOfChange(IChunkActor actor, MinecraftVersion lastPlayerVersion, int suggestedMaxPlayerRequests, MinecraftVersion lastBlockVersion, int suggestedMaxBlockRequests);
 
     }
 }

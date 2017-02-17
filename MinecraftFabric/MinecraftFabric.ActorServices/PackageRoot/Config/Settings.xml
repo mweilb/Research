@@ -7,6 +7,13 @@
   <Section Name="ActorServicesActorServiceReplicatorSecurityConfig">
     <Parameter Name="CredentialType" Value="None" />
   </Section>
+  <Section Name="BlocksPerChunkActorServiceReplicatorConfig">
+    <Parameter Name="ReplicatorEndpoint" Value="BlocksPerChunkActorServiceReplicatorEndpoint" />
+    <Parameter Name="BatchAcknowledgementInterval" Value="0.005" />
+  </Section>
+  <Section Name="BlocksPerChunkActorServiceReplicatorSecurityConfig">
+    <Parameter Name="CredentialType" Value="None" />
+  </Section>
   <Section Name="ChunkActorServiceReplicatorConfig">
     <Parameter Name="ReplicatorEndpoint" Value="ChunkActorServiceReplicatorEndpoint" />
     <Parameter Name="BatchAcknowledgementInterval" Value="0.005" />
@@ -14,11 +21,25 @@
   <Section Name="ChunkActorServiceReplicatorSecurityConfig">
     <Parameter Name="CredentialType" Value="None" />
   </Section>
+  <Section Name="InformActorServiceReplicatorConfig">
+    <Parameter Name="ReplicatorEndpoint" Value="InformActorServiceReplicatorEndpoint" />
+    <Parameter Name="BatchAcknowledgementInterval" Value="0.005" />
+  </Section>
+  <Section Name="InformActorServiceReplicatorSecurityConfig">
+    <Parameter Name="CredentialType" Value="None" />
+  </Section>
   <Section Name="PlayerAgentActorServiceReplicatorConfig">
     <Parameter Name="ReplicatorEndpoint" Value="PlayerAgentActorServiceReplicatorEndpoint" />
     <Parameter Name="BatchAcknowledgementInterval" Value="0.005" />
   </Section>
   <Section Name="PlayerAgentActorServiceReplicatorSecurityConfig">
+    <Parameter Name="CredentialType" Value="None" />
+  </Section>
+  <Section Name="PlayersPerChunkActorServiceReplicatorConfig">
+    <Parameter Name="ReplicatorEndpoint" Value="PlayersPerChunkActorServiceReplicatorEndpoint" />
+    <Parameter Name="BatchAcknowledgementInterval" Value="0.005" />
+  </Section>
+  <Section Name="PlayersPerChunkActorServiceReplicatorSecurityConfig">
     <Parameter Name="CredentialType" Value="None" />
   </Section>
   <Section Name="WorldActorServiceReplicatorConfig">
