@@ -11,9 +11,7 @@ namespace MinecraftFabric.ActorServices.Actors
 {
     class ChunkActor : Actor, IChunkActor
     {
-        Dictionary<ActorId, MinecraftVersion> mNeedsInitObservers;
-        Dictionary<ActorId, MinecraftVersion> mObservers;
- 
+        private IActorTimer _updateTimer;
 
         public ChunkActor(ActorService actorService, ActorId actorId) : base(actorService, actorId)
         {
@@ -25,118 +23,133 @@ namespace MinecraftFabric.ActorServices.Actors
         protected override Task OnActivateAsync()
         {
             ActorEventSource.Current.ActorMessage(this, "ChunkActor activated.");
-
-            this.StateManager.TryAddStateAsync("minLocation", new Position());
+            
+            this.StateManager.TryAddStateAsync("observers", new Dictionary<ActorId, MinecraftVersion>());
+            this.StateManager.TryAddStateAsync("associations", new Dictionary<ActorId, AssociateChunkMetaData>());
+            this.StateManager.TryAddStateAsync("updateRateMS", 30);
+            this.StateManager.TryAddStateAsync("worldActorID", new ActorId(""));
+            this.StateManager.TryAddStateAsync("minLocation", new Position(0,0,0));
             this.StateManager.TryAddStateAsync("chunkStride", 0);
-      
-            this.StateManager.TryAddStateAsync("activePlayers", new Dictionary<ActorId, PlayerMetaData>());
-            this.StateManager.TryAddStateAsync("activeBlocks", new Dictionary<ActorId, BlockMetaData>());
-
             return Task.FromResult(0);
         }
-
-        public Task<GenericResponse> Associate(ActorId sessionID, ActorId chunkID, int fidelity, Position position, int blockStride)
+ 
+        public async Task<GenericResponse> Initialize(ActorId sessionID, Position minLocation, int chunkStride)
         {
-            throw new NotImplementedException();
+            await this.StateManager.SetStateAsync("worldActorID", sessionID);
+            await this.StateManager.SetStateAsync("minLocation", minLocation);
+            await this.StateManager.SetStateAsync("chunkStride", chunkStride);
+            return new GenericResponse();
         }
 
-        public Task<InformOfChunkChangeResponse> InformOfChange(IChunkActor actor, MinecraftVersion lastPlayerVersion, int suggestedMaxPlayerRequests, MinecraftVersion lastBlockVersion, int suggestedMaxBlockRequests)
+        public async Task<GenericResponse> Associate(ActorId sessionID, ActorId actorID, int fidelity, Position position, int blockStride)
         {
-            throw new NotImplementedException();
+            var associations = await this.StateManager.GetStateAsync<Dictionary<ActorId, AssociateChunkMetaData>>("associations");
+
+            var metaData = new AssociateChunkMetaData(actorID,fidelity,position,blockStride);
+            associations.Add(actorID, metaData);
+            await this.StateManager.SetStateAsync<Dictionary<ActorId, AssociateChunkMetaData>>("associations", associations);
+
+            return new GenericResponse();
         }
 
-        public Task<GenericResponse> Initialize(ActorId sessionID, Position minLocation, int chunkStride)
+        public async Task<ActorId[]> GetAssociations()
         {
-            throw new NotImplementedException();
-        }
-
-        public Task<BlockMetaData[]> InspectBlocks()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<PlayerMetaData[]> InspectPlayers()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<GenericResponse> LeavePlayer(ActorId playerAgentID)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<GenericResponse> SetResponseTime(int millisecond)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<GenericResponse> StartPlayer(ActorId playerAgentID, Vector pos, string[] fromActors)
-        {
-
-            var players = await this.StateManager.GetStateAsync<Dictionary<IPlayerAgent, ActorId>>("activePlayers");
-
-            //Is player already here?
-            int idx = players.ContainsKey(playerAgentID);
-            if (idx >= 0)
+            var associations = await this.StateManager.GetStateAsync<Dictionary<ActorId, AssociateChunkMetaData>>("associations");
+            if (associations.Count > 0)
             {
-                return Task.FromResult<FeedbackMessage>(new FeedbackMessage(FeedbackMessage.Responces.Error, "Already Exist"));
+                var actorIDs = new ActorId[associations.Count];
+                associations.Keys.CopyTo(actorIDs,0);
+                return actorIDs;
             }
 
-            //Add this player to the active list for other to monitors
-            PlayerInfo update = new PlayerInfo();
-            update.mPosition = position;
-            update.mVersion = MinecraftVersion.GetNext();
-            update.mID = playerSessionID;
-            mActivePlayers.Add(update);
+            return null;
+        }
 
+        public async Task<GenericResponse> SetResponseTime(int millisecond)
+        {
+            await this.StateManager.SetStateAsync<int>("updateRateMS", millisecond);
+            return new GenericResponse();
+        }
 
+        public async Task<GenericResponse> RegisterObserver(ActorId playerAgentID, ActorId[] fromActors)
+        {
+            var players = await this.StateManager.GetStateAsync<Dictionary<ActorId,MinecraftVersion>>("observers");
+            var version = MinecraftVersion.GetNext();
+            
+            //Is player already here?
+            if (players.ContainsKey(playerAgentID) == true)
+             {
+                return new GenericResponse(true, "Already Exist");
+            }
 
             //this player want to listen to all associated blocks
-            mNeedsInitObservers.Add(playerObserver);
+            players.Add(playerAgentID, version);
+            await this.StateManager.SetStateAsync("observers", players);
 
+
+            var associations = await this.StateManager.GetStateAsync<Dictionary<ActorId, AssociateChunkMetaData>>("associations");
+
+            //map to hash for faster lookup
+            var map = new HashSet<ActorId>();
+            foreach (var actor in fromActors)
+            {
+                map.Add(actor);
+            }
 
             //each associated grain needs to update this one
-            foreach (var pair in mAssociatedGrains)
+            foreach (var pair in associations)
             {
-                bool bFound = false;
-                if (fromGrain != null)
+                var actorID = pair.Key;
+                if (map.Contains(actorID) == false)
                 {
-                    foreach (var id in fromGrain)
-                    {
-                        if (id == pair.Key)
-                        {
-                            bFound = true;
-                            break;
-                        }
-                    }
-                }
-
-                if (bFound == false)
-                {
-                    var tracking = pair.Value;
-                    tracking.mNeedInitObservers.Add(playerObserver);
+                    var assoicationMetaData = pair.Value;
+                    assoicationMetaData.needInitObservers.Add(actorID);
                 }
             }
 
 
             //if no updates are occuring, now we have a player to update
-            if (mTimer == null)
+            if (_updateTimer == null)
             {
-                mTimer = RegisterTimer((_) => Fetch(), null, TimeSpan.FromMilliseconds(0), TimeSpan.FromMilliseconds(mUpdateRateinMilliSeconds));
+                _updateTimer = RegisterTimer((_) => Fetch(), null, TimeSpan.FromMilliseconds(0), TimeSpan.FromMilliseconds(mUpdateRateinMilliSeconds));
             }
 
-            return Task.FromResult<FeedbackMessage>(new FeedbackMessage(FeedbackMessage.Responces.None));
+            return new GenericResponse();
         }
 
-        public Task<GenericResponse> UpdateBlock(ActorId playerAgentID, BlockMetaData blockUpdate)
+        public async Task<GenericResponse> UnRegisterObserver(ActorId playerAgentID)
+        {
+            var players = await this.StateManager.GetStateAsync<Dictionary<ActorId, MinecraftVersion>>("observers");
+
+            if (players.ContainsKey(playerAgentID))
+            {
+                players.Remove(playerAgentID);
+                await this.StateManager.SetStateAsync("observers", players);
+
+                if (players.Count == 0)
+                {
+                    if (_updateTimer != null)
+                    {
+                        UnregisterTimer(_updateTimer);
+                    }
+                }
+                return new GenericResponse();
+            }
+
+            return new GenericResponse(false, "Observer not found");
+        }
+
+ 
+        public Task<InformOfChunkChangeResponse> InformOfChange(IChunkActor actor, MinecraftVersion lastPlayerVersion, int suggestedMaxPlayerRequests, MinecraftVersion lastBlockVersion, int suggestedMaxBlockRequests)
         {
             throw new NotImplementedException();
         }
 
-        public Task<string> UpdatePlayer(long playerAgentID, Vector pos)
+        private Task Fetch()
         {
-            throw new NotImplementedException();
+        
+            return Task.FromResult(true);
         }
     }
 }
-}
+ 

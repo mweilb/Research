@@ -13,17 +13,11 @@ namespace MinecraftFabric.ActorServices.Interfaces
         Task<GenericResponse> Associate(ActorId sessionID, ActorId chunkID, int fidelity, Position position, int blockStride);
         Task<GenericResponse> SetResponseTime(int millisecond);
 
-        Task<GenericResponse> StartPlayer(ActorId playerAgentID, Vector pos, string[] fromActors);
-        Task<string> UpdatePlayer(Int64 playerAgentID, Vector pos);
-        Task<GenericResponse> LeavePlayer(ActorId playerAgentID);
-
-        Task<GenericResponse> UpdateBlock(ActorId playerAgentID, BlockMetaData blockUpdate);
+        Task<GenericResponse> RegisterObserver(ActorId playerAgentID, string[] fromActors);
+        
+        Task<GenericResponse> UnRegisterObserver(ActorId playerAgentID);
 
         Task<InformOfChunkChangeResponse> InformOfChange(IChunkActor actor, MinecraftVersion lastPlayerVersion, int suggestedMaxPlayerRequests, MinecraftVersion lastBlockVersion, int suggestedMaxBlockRequests);
 
-        //Not for simulation, but for testing
-        Task<PlayerMetaData[]> InspectPlayers();
-
-        Task<BlockMetaData[]> InspectBlocks();
     }
 }

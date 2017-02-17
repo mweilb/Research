@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace MinecraftFabric.ActorServices.Interfaces
 {
-    public interface IBlocksPerChunkActor
+    public interface IPlayersPerChunkActor : IActor
     {
-        Task<GenericResponse> Update(Int64 playerAgentID, BlockMetaData blockData);
-        Task<GenericResponse> Remove(ActorId playerAgentID, BlockMetaData blockData);
-        Task<BlockMetaData[]> GetAsync();
+        Task<GenericResponse> Update(ActorId playerAgentID, PlayerMetaData playerMetaData);
+        Task<GenericResponse> Remove(ActorId playerAgentID);
+        Task<PlayerMetaData[]> Get();
     }
 }

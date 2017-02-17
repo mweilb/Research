@@ -15,6 +15,48 @@
         </Extension>
       </Extensions>
     </StatefulServiceType>
+    <StatefulServiceType ServiceTypeName="ChunkActorServiceType">
+      <Extensions>
+        <Extension Name="__GeneratedServiceType__" GeneratedId="5d02f4b6-c9dc-4871-a3ba-af29de4cca93|None">
+          <GeneratedNames xmlns="http://schemas.microsoft.com/2015/03/fabact-no-schema">
+            <DefaultService Name="ChunkActorService" />
+            <ServiceEndpoint Name="ChunkActorServiceEndpoint" />
+            <ReplicatorEndpoint Name="ChunkActorServiceReplicatorEndpoint" />
+            <ReplicatorConfigSection Name="ChunkActorServiceReplicatorConfig" />
+            <ReplicatorSecurityConfigSection Name="ChunkActorServiceReplicatorSecurityConfig" />
+            <StoreConfigSection Name="ChunkActorServiceLocalStoreConfig" />
+          </GeneratedNames>
+        </Extension>
+      </Extensions>
+    </StatefulServiceType>
+    <StatefulServiceType ServiceTypeName="PlayerAgentActorServiceType">
+      <Extensions>
+        <Extension Name="__GeneratedServiceType__" GeneratedId="e2e4b9f6-af53-479c-af1c-2fc81535dc9f|None">
+          <GeneratedNames xmlns="http://schemas.microsoft.com/2015/03/fabact-no-schema">
+            <DefaultService Name="PlayerAgentActorService" />
+            <ServiceEndpoint Name="PlayerAgentActorServiceEndpoint" />
+            <ReplicatorEndpoint Name="PlayerAgentActorServiceReplicatorEndpoint" />
+            <ReplicatorConfigSection Name="PlayerAgentActorServiceReplicatorConfig" />
+            <ReplicatorSecurityConfigSection Name="PlayerAgentActorServiceReplicatorSecurityConfig" />
+            <StoreConfigSection Name="PlayerAgentActorServiceLocalStoreConfig" />
+          </GeneratedNames>
+        </Extension>
+      </Extensions>
+    </StatefulServiceType>
+    <StatefulServiceType ServiceTypeName="WorldActorServiceType" HasPersistedState="true">
+      <Extensions>
+        <Extension Name="__GeneratedServiceType__" GeneratedId="53e92b67-a0f6-47c4-8957-fa947e73d25f|Persisted">
+          <GeneratedNames xmlns="http://schemas.microsoft.com/2015/03/fabact-no-schema">
+            <DefaultService Name="WorldActorService" />
+            <ServiceEndpoint Name="WorldActorServiceEndpoint" />
+            <ReplicatorEndpoint Name="WorldActorServiceReplicatorEndpoint" />
+            <ReplicatorConfigSection Name="WorldActorServiceReplicatorConfig" />
+            <ReplicatorSecurityConfigSection Name="WorldActorServiceReplicatorSecurityConfig" />
+            <StoreConfigSection Name="WorldActorServiceLocalStoreConfig" />
+          </GeneratedNames>
+        </Extension>
+      </Extensions>
+    </StatefulServiceType>
   </ServiceTypes>
   <CodePackage Name="Code" Version="1.0.0">
     <EntryPoint>
@@ -28,6 +70,12 @@
     <Endpoints>
       <Endpoint Name="ActorServicesActorServiceEndpoint" />
       <Endpoint Name="ActorServicesActorServiceReplicatorEndpoint" />
+      <Endpoint Name="ChunkActorServiceEndpoint" />
+      <Endpoint Name="ChunkActorServiceReplicatorEndpoint" />
+      <Endpoint Name="PlayerAgentActorServiceEndpoint" />
+      <Endpoint Name="PlayerAgentActorServiceReplicatorEndpoint" />
+      <Endpoint Name="WorldActorServiceEndpoint" />
+      <Endpoint Name="WorldActorServiceReplicatorEndpoint" />
     </Endpoints>
   </Resources>
   <!-- The content will be generated during build -->

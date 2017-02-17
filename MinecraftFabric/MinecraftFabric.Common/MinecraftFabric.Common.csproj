@@ -76,10 +76,12 @@
     <Compile Include="DataContracts\Vector.cs" />
     <Compile Include="DataContracts\WorldInfoMetaData.cs" />
     <Compile Include="Events\IChunkUpdateEvent.cs" />
+    <Compile Include="Interfaces\IBlocksPerChunkActor.cs" />
     <Compile Include="Interfaces\IActorServices.cs" />
     <Compile Include="Interfaces\IChunkActor.cs" />
     <Compile Include="Interfaces\IPlayerAgent.cs" />
     <Compile Include="Interfaces\IWorldActor.cs" />
+    <Compile Include="Interfaces\IPlayersPerChunkActor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TaskResponses\GenericResponse.cs" />
     <Compile Include="TaskResponses\GetWorldInfoResponse.cs" />

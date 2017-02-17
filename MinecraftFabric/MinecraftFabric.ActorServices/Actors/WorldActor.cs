@@ -16,6 +16,21 @@ namespace MinecraftFabric.ActorServices.Actors
     [StatePersistence(StatePersistence.Persisted)]
     class WorldActor : Actor, IWorldActor
     {
+
+        class Tracking
+        {
+            public ChunkActor mChunk;
+            public Position mMinPosition;
+            public Position mMaxPosition;
+            public Tracking(ChunkActor chunk, Position minPosition, Position maxPosition)
+            {
+                mChunk = chunk;
+                mMinPosition = new Position(minPosition);
+                mMaxPosition = new Position(maxPosition);
+            }
+        }
+
+     
         /// <summary>
         /// Initializes a new instance of ActorServices
         /// </summary>
@@ -59,9 +74,10 @@ namespace MinecraftFabric.ActorServices.Actors
             metaData.chunkCount = 0;
 
             this.StateManager.SetStateAsync<WorldInfoMetaData>("metaData", metaData);
-              
-
-     
+            
+            var chunkDictionary = new Dictionary<ActorId, Tracking>();
+            GenerateChunks(chunkDictionary, beginPoint, endPoint, chunkSize);
+            AssociateChunks(chunkDictionary, visibilityChunkCount, chunkSize);
             return Task.FromResult<GenericResponse>(response);
 
         }
@@ -71,7 +87,7 @@ namespace MinecraftFabric.ActorServices.Actors
             return this.StateManager.GetStateAsync<WorldInfoMetaData>("metaData"); ;
         }
 
-        private void GenerateChunks(Position beginPoint, Position endPoint, int chunkStride)
+        private void GenerateChunks(Dictionary<ActorId, Tracking> chunkDictionary, Position beginPoint, Position endPoint, int chunkStride)
         {
             for (int x = beginPoint.x; x <= endPoint.x; x += chunkStride)
             {
@@ -80,71 +96,46 @@ namespace MinecraftFabric.ActorServices.Actors
                     for (int z = beginPoint.z; z <= endPoint.z; z += chunkStride)
                     {
                         var minPosition = new Position(x, y, z);
-                        string guid = string.Concat(this.Id, "#", x, "#", y, "#", z);
-
-                        var chunkActor = ActorProxy.Create<ChunkActor>(new ActorId(guid),this.ServiceUri);
+                        ActorId actorID = new ActorId(string.Concat(this.Id, "#", x, "#", y, "#", z));
+           
+                        var chunkActor = ActorProxy.Create<ChunkActor>(actorID, this.ServiceUri);
                    
                         var maxPosition = new Position(minPosition);
                         maxPosition.x += chunkStride;
                         maxPosition.y += chunkStride;
                         maxPosition.z += chunkStride;
 
-                        if (mChunkGrains.ContainsKey(guid) == false)
+                        if (chunkDictionary.ContainsKey(actorID) == false)
                         {
-                            mChunkGrains.Add(guid, new Tracking(grainInstance, minPosition, maxPosition));
+                            chunkDictionary.Add(actorID, new Tracking(chunkActor, minPosition, maxPosition));
                             chunkActor.Initialize(this.Id, minPosition, chunkStride);
-                        }
-
-                       
-
+                        }   
                     }
-
                 }
-
             }
-
         }
 
-
-
-        private void AssociateGrains(int visibilityChunkCount, Position chunkSize)
+        private void AssociateChunks(Dictionary<ActorId, Tracking> chunkDictionary, int visibilityChunkCount, int chunkSize)
         {
-            foreach (var pair in mChunkGrains)
+            foreach (var pair in chunkDictionary)
             {
                 var pos = pair.Value.mMinPosition;
-                var grain = pair.Value.mChunk;
+                var actor = pair.Value.mChunk;
 
                 for (int x = -visibilityChunkCount / 2; x < visibilityChunkCount / 2; x++)
-                {
-
-
-             
+                {     
                     for (int y = -visibilityChunkCount / 2; y < visibilityChunkCount  / 2; y++)
-
                     {
-
-
-
                         for (int z = -visibilityChunkCount / 2; z < visibilityChunkCount  / 2; z++)
-
                         {
-
                             int fidelity = 0;
-
-                            var newPos = new Position((x * chunkSize.x) + pos.x, (y * chunkSize.y) + pos.y, (z * chunkSize.z) + pos.z);
-
-                            string guid = string.Concat(this.Id, "#", newPos.x, "#", newPos.y, "#", newPos.z);
+                            var newPos = new Position((x * chunkSize) + pos.x, (y * chunkSize) + pos.y, (z * chunkSize) + pos.z);
+                            var actorID = new ActorId(string.Concat(this.Id, "#", newPos.x, "#", newPos.y, "#", newPos.z));
                           
-
-                            if (mChunkGrains.ContainsKey(id) == true)
-
+                            if (chunkDictionary.ContainsKey(actorID) == true)
                             {
-
-                                string grainId = string.Concat(this.Id, "#", newPos.x, "#", newPos.y, "#", newPos.z);
-
-                                var tracking = mChunkGrains[id];
-
-                                grain.Associate(mSessionID, grainId, fidelity, tracking.mMinPosition, tracking.mMaxPosition);
+                                var tracking = chunkDictionary[actorID];
+                                actor.Associate(this.Id, actorID, fidelity, tracking.mMinPosition, chunkSize);
 
                             }
 
@@ -153,13 +144,7 @@ namespace MinecraftFabric.ActorServices.Actors
                     }
 
                 }
-
-
-
             }
-
         }
-
-
     }
 }
