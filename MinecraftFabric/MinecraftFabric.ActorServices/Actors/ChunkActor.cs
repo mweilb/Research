@@ -23,7 +23,8 @@ namespace MinecraftFabric.ActorServices.Actors
         protected override Task OnActivateAsync()
         {
             ActorEventSource.Current.ActorMessage(this, "ChunkActor activated.");
-            
+
+            this.StateManager.TryAddStateAsync("initializeObservers", new Dictionary<ActorId, MinecraftVersion>());
             this.StateManager.TryAddStateAsync("observers", new Dictionary<ActorId, MinecraftVersion>());
             this.StateManager.TryAddStateAsync("associations", new Dictionary<ActorId, AssociateChunkMetaData>());
             this.StateManager.TryAddStateAsync("updateRateMS", 30);
@@ -83,8 +84,9 @@ namespace MinecraftFabric.ActorServices.Actors
             }
 
             //this player want to listen to all associated blocks
-            players.Add(playerAgentID, version);
-            await this.StateManager.SetStateAsync("observers", players);
+            var initPlayers = await this.StateManager.GetStateAsync<Dictionary<ActorId, MinecraftVersion>>("initializeObservers");
+            initPlayers.Add(playerAgentID, version);
+            await this.StateManager.SetStateAsync("initializeObservers", initPlayers);
 
 
             var associations = await this.StateManager.GetStateAsync<Dictionary<ActorId, AssociateChunkMetaData>>("associations");
@@ -111,7 +113,8 @@ namespace MinecraftFabric.ActorServices.Actors
             //if no updates are occuring, now we have a player to update
             if (_updateTimer == null)
             {
-                _updateTimer = RegisterTimer((_) => Fetch(), null, TimeSpan.FromMilliseconds(0), TimeSpan.FromMilliseconds(mUpdateRateinMilliSeconds));
+                int updateRate = await this.StateManager.GetStateAsync<int>("initializeObservers");
+                _updateTimer = RegisterTimer((_) => Fetch(), null, TimeSpan.FromMilliseconds(0), TimeSpan.FromMilliseconds(updateRate));
             }
 
             return new GenericResponse();
@@ -126,6 +129,13 @@ namespace MinecraftFabric.ActorServices.Actors
                 players.Remove(playerAgentID);
                 await this.StateManager.SetStateAsync("observers", players);
 
+                var initPlayers = await this.StateManager.GetStateAsync<Dictionary<ActorId, MinecraftVersion>>("initializeObservers");
+                if (initPlayers.ContainsKey(playerAgentID))
+                {
+                    initPlayers.Remove(playerAgentID);
+                    await this.StateManager.SetStateAsync("initializeObservers", initPlayers);
+                }
+
                 if (players.Count == 0)
                 {
                     if (_updateTimer != null)
@@ -133,6 +143,7 @@ namespace MinecraftFabric.ActorServices.Actors
                         UnregisterTimer(_updateTimer);
                     }
                 }
+
                 return new GenericResponse();
             }
 
@@ -145,10 +156,161 @@ namespace MinecraftFabric.ActorServices.Actors
             throw new NotImplementedException();
         }
 
-        private Task Fetch()
+        private async Task Fetch()
         {
-        
-            return Task.FromResult(true);
+            var associations = await this.StateManager.GetStateAsync<Dictionary<ActorId, AssociateChunkMetaData>>("associations");
+
+            if (HasLastFetchFinished(associations) == false)
+            {
+                return;
+            }
+
+            CalculateDistribution(associations,1000,4096);
+
+            foreach (var pair in associations)
+            {
+                var tracking = pair.Value;
+ 
+                var task = tracking.updateTask;
+                if (task != null)
+                {
+                    var response = task.Result;
+                    tracking.playerVersion = response.lastPlayersVersion;
+                    tracking.blockVersion = response.lastBlockVersion;
+                }
+
+                if ((tracking.needInitObservers.Count > 0) || (observers.Count > 0))
+                {
+                    var actorID = tracking.actorID;
+
+                    tracking.updateTask = grain.InformOfChange(tracking.mNeedInitObservers, mObservers, tracking.mPlayerVersion, tracking.mMaxPlayers, tracking.mBlockVersion, tracking.mMaxBlocks);
+                }
+
+                tracking.mNeedInitObservers.Clear();
+
+            }
+
+            mObservers.AddRange(mNeedsInitObservers);
+            mNeedsInitObservers.Clear();
+
+            return;
+
+        }
+
+        private bool HasLastFetchFinished(Dictionary<ActorId, AssociateChunkMetaData> associations)
+        {
+            bool ready = true;
+            //know how many you want to update...
+            foreach (var pair in associations)
+            {
+                var tracking = pair.Value;
+
+                //see if the last run is done for this request, and update 
+                if (tracking.updateTask != null)
+                {
+                    var task = tracking.updateTask;
+                    if (task.IsCompleted == false)
+                    {
+                        ready = false;
+                    }
+                }
+            }
+
+            return ready;
+        }
+
+        private void CalculateDistribution(Dictionary<ActorId, AssociateChunkMetaData> associations, int playerBandwidthCap, int blockBandwithCap)
+        {
+            //need to this chunk first as it is closet to player
+            //need to recalculate what we expect out of each chunk
+            //now tell the system to update the surrounding
+            //know how many you want to update...
+            int[] nBlocksLeft = { 0, 0, 0, 0 };
+            int[] nPlayersLeft = { 0, 0, 0, 0 };
+            float[] blocksPercents = { 1.0f, 1.0f, 1.0f, 1.0f };
+            float[] playersPercents = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+            const int MaxFidelity = 3;
+            foreach (var pair in associations)
+            {
+                var tracking = pair.Value;
+                //see if the last run is done for this request, and update 
+                if (tracking.updateTask != null)
+                {
+                    var result = tracking.updateTask.Result;
+                    if (tracking.fidelity < MaxFidelity)
+                    {
+                        nBlocksLeft[tracking.fidelity] += result.availableBlocks;
+                        nPlayersLeft[tracking.fidelity] += result.availablePlayers;
+                    }
+                    else
+                    {
+                        nBlocksLeft[MaxFidelity] += result.availableBlocks;
+                        nPlayersLeft[MaxFidelity] += result.availablePlayers;
+                    }
+                }
+            }
+
+
+            int availablePlayers = playerBandwidthCap;
+            int availableBlocks = blockBandwithCap;
+            for (int idx = 0; idx <= MaxFidelity; idx++)
+            {
+                availablePlayers = FigureCountPerFidelity(nPlayersLeft, playersPercents, idx, MaxFidelity, availablePlayers);
+                availableBlocks = FigureCountPerFidelity(nBlocksLeft, blocksPercents, idx, MaxFidelity, availableBlocks);
+            }
+
+            //fidelity 0 is always 100%
+            playersPercents[0] = 1.0f;
+            blocksPercents[0] = 1.0f;
+
+            foreach (var pair in associations)
+            {
+                var tracking = pair.Value;
+                int index = tracking.fidelity;
+                if (index > MaxFidelity)
+                {
+                    index = MaxFidelity;
+                }
+
+                if (tracking.updateTask != null)
+                {
+                    var result = tracking.updateTask.Result;
+
+                    tracking.maxPlayers = (int)(playersPercents[index] * result.availablePlayers);
+                    tracking.maxBlocks = (int)(blocksPercents[index] * result.availableBlocks);
+                }
+                else
+                {
+                    tracking.maxPlayers = (int)(playersPercents[index] * playerBandwidthCap);
+                    tracking.maxBlocks = (int)(blocksPercents[index] * blockBandwithCap);
+                }
+
+            }
+        }
+
+        private int FigureCountPerFidelity(int[] whatLefts, float[] whatPercent, int fidelity, int MaxFidelity, int availablePlayers)
+        {
+            if ((availablePlayers > 0) && (whatLefts[fidelity] > 0))
+            {
+                if (whatLefts[fidelity] > availablePlayers)
+                {
+                    for (int idx = fidelity + 1; idx <= MaxFidelity; idx++)
+                    {
+                        whatPercent[idx] = 0;
+                    }
+
+                    availablePlayers = 0;
+                    whatPercent[fidelity] = whatLefts[fidelity] / availablePlayers;
+                }
+                else
+                {
+                    whatPercent[fidelity] = 1.0f;
+                    availablePlayers -= whatLefts[fidelity];
+                }
+            }
+
+            return availablePlayers;
         }
     }
 }
