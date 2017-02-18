@@ -1,15 +1,11 @@
-# Files
+
 *.suo
 *.pdb
 *.exe
 *.dll
 *.cache
-# Directories
-**/bin/ 
-**/Debug/
-**/Release/
-**/Beta/
+#directory
+**/[Dd]ebug/**
+**/obj/**
+**/packages/**
  
-MinecraftFabric/MinecraftFabric.ActorServices/bin/x64/Debug/MinecraftFabric.ActorServices.exe
-MinecraftFabric/MinecraftFabric.ActorServices/bin/x64/Debug/MinecraftFabric.ActorServices.exe
-MinecraftFabric/MinecraftFabric.Common/obj/x64/Debug/CoreCompileInputs.cache
