@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.26206.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{A07B5EB6-E848-4116-A8D0-A826331D98C6}") = "MinecraftFabric", "MinecraftFabric\MinecraftFabric.sfproj", "{01C8F6FA-E964-42AD-ADA4-7790D8BA6035}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinecraftFabric.WebService", "MinecraftFabric.WebService\MinecraftFabric.WebService.csproj", "{150515BF-3695-436C-B12C-7A80B1AD94B6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MinecraftFabric.WebService", "MinecraftFabric.WebService\MinecraftFabric.WebService.csproj", "{150515BF-3695-436C-B12C-7A80B1AD94B6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinecraftFabric.Actors", "MinecraftFabric.Actors\MinecraftFabric.Actors.csproj", "{D5EC2C63-47AB-400B-8B7B-C18617943564}"
 EndProject
@@ -22,6 +22,8 @@ Global
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{01C8F6FA-E964-42AD-ADA4-7790D8BA6035}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{01C8F6FA-E964-42AD-ADA4-7790D8BA6035}.Debug|Any CPU.Build.0 = Debug|x64
+		{01C8F6FA-E964-42AD-ADA4-7790D8BA6035}.Debug|Any CPU.Deploy.0 = Debug|x64
 		{01C8F6FA-E964-42AD-ADA4-7790D8BA6035}.Debug|x64.ActiveCfg = Debug|x64
 		{01C8F6FA-E964-42AD-ADA4-7790D8BA6035}.Debug|x64.Build.0 = Debug|x64
 		{01C8F6FA-E964-42AD-ADA4-7790D8BA6035}.Debug|x64.Deploy.0 = Debug|x64
@@ -44,6 +46,7 @@ Global
 		{150515BF-3695-436C-B12C-7A80B1AD94B6}.Release|x86.ActiveCfg = Release|x86
 		{150515BF-3695-436C-B12C-7A80B1AD94B6}.Release|x86.Build.0 = Release|x86
 		{D5EC2C63-47AB-400B-8B7B-C18617943564}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{D5EC2C63-47AB-400B-8B7B-C18617943564}.Debug|Any CPU.Build.0 = Debug|x64
 		{D5EC2C63-47AB-400B-8B7B-C18617943564}.Debug|x64.ActiveCfg = Debug|x64
 		{D5EC2C63-47AB-400B-8B7B-C18617943564}.Debug|x64.Build.0 = Debug|x64
 		{D5EC2C63-47AB-400B-8B7B-C18617943564}.Debug|x86.ActiveCfg = Debug|x64
@@ -52,6 +55,7 @@ Global
 		{D5EC2C63-47AB-400B-8B7B-C18617943564}.Release|x64.Build.0 = Release|x64
 		{D5EC2C63-47AB-400B-8B7B-C18617943564}.Release|x86.ActiveCfg = Release|x64
 		{34511D0F-5F40-473D-BD33-319DD0C9013F}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{34511D0F-5F40-473D-BD33-319DD0C9013F}.Debug|Any CPU.Build.0 = Debug|x64
 		{34511D0F-5F40-473D-BD33-319DD0C9013F}.Debug|x64.ActiveCfg = Debug|x64
 		{34511D0F-5F40-473D-BD33-319DD0C9013F}.Debug|x64.Build.0 = Debug|x64
 		{34511D0F-5F40-473D-BD33-319DD0C9013F}.Debug|x86.ActiveCfg = Debug|x64

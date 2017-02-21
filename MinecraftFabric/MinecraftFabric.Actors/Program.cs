@@ -21,8 +21,18 @@ namespace MinecraftFabric.Actors
                 // are automatically populated when you build this project.
                 // For more information, see https://aka.ms/servicefabricactorsplatform
 
-                ActorRuntime.RegisterActorAsync<Actors>(
-                   (context, actorType) => new ActorService(context, actorType)).GetAwaiter().GetResult();
+                ActorRuntime.RegisterActorAsync<WorldActor>(
+                    (context, actorType) => new ActorService(context, actorType)).GetAwaiter().GetResult();
+                ActorRuntime.RegisterActorAsync<ChunkActor>(
+                    (context, actorType) => new ActorService(context, actorType)).GetAwaiter().GetResult();
+                ActorRuntime.RegisterActorAsync<InformActor>(
+                    (context, actorType) => new ActorService(context, actorType)).GetAwaiter().GetResult();
+                ActorRuntime.RegisterActorAsync<PlayerAgent>(
+                    (context, actorType) => new ActorService(context, actorType)).GetAwaiter().GetResult();
+                ActorRuntime.RegisterActorAsync<BlocksPerChunkActor>(
+                     (context, actorType) => new ActorService(context, actorType)).GetAwaiter().GetResult();
+                ActorRuntime.RegisterActorAsync<PlayersPerChunkActor>(
+                       (context, actorType) => new ActorService(context, actorType)).GetAwaiter().GetResult();
 
                 Thread.Sleep(Timeout.Infinite);
             }
